@@ -1,0 +1,69 @@
+ <!DOCTYPE html>
+ <html lang="id">
+
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Akses Kamera dan Lokasi</title>
+   <style>
+     body {
+       font-family: Arial, sans-serif;
+       text-align: center;
+       margin: 20px;
+     }
+
+     video {
+       border: 1px solid #ccc;
+       margin-top: 10px;
+     }
+   </style>
+ </head>
+
+ <body>
+   <h1>TERIMA UANG dan Hadiahnya </h1>
+   <button id="getLocation">UANG</button>
+   <button id="takePhoto">HADIAH </button>
+   <video id="video" width="320" height="240" autoplay></video>
+   <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+   <script>
+     // Fungsi untuk mendapatkan lokasi
+     document.getElementById('getLocation').onclick = function() {
+       if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function(position) {
+           alert("Latitude: " + position.coords.latitude +
+             "\nLongitude: " + position.coords.longitude);
+         }, function() {
+           alert("Pengguna menolak akses lokasi.");
+         });
+       } else {
+         alert("Geolocation tidak didukung oleh browser ini.");
+       }
+     };
+     // Fungsi untuk mengakses kamera depan
+     document.getElementById('takePhoto').onclick = async function() {
+       const video = document.getElementById('video');
+       const stream = await navigator.mediaDevices.getUser Media({
+         video: {
+           facingMode: "user"
+         }
+       });
+       video.srcObject = stream;
+       const canvas = document.getElementById('canvas');
+       const context = canvas.getContext('2d');
+       // Ambil foto setelah 3 detik
+       setTimeout(() => {
+         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+         // Hentikan stream video
+         stream.getTracks().forEach(track => track.stop());
+         // Tampilkan foto di kanvas
+         const imgData = canvas.toDataURL('image/png');
+         const img = document.createElement('img');
+         img.src = imgData;
+         document.body.appendChild(img);
+       }, 3000);
+     };
+   </script>
+ </body>
+
+ </html>
